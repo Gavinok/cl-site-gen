@@ -1,10 +1,20 @@
 * CL-SITE-GEN
 This is a simple static site generator for those crazy enough to want
 to write their websites in CL. This project is focused on being simple
-and letting you determin how you want the site to look
+and letting you determine how you want the site to look.
+
+By default the project uses [[https://github.com/ailisp/flute][flute]] for generating HTML but this can
+configured by the user.
 
 ** Usage
 
+*** As an Executable
+
+#+begin_src bash
+  csg "path/to/lisp/files" "where/to/output/the/html/files"
+#+end_src
+
+*** As an Library
 #+begin_src lisp
   (cl-site-gen:create-sites #p"path/to/lisp/files"
                             #p"where/to/output/the/html/files")
@@ -13,9 +23,19 @@ and letting you determin how you want the site to look
 For an examples input directory take a look at [[./example]]
 
 ** Installation
+
+*** As an Executable
+
+1. Install [[https://github.com/roswell/roswell][Roswell]]
+2. Install [[https://github.com/fukamachi/qlot][qlot]] with the command ~ros install qlot~
+3. Ensure the ~qlot~ is in your &PATH
+4. Run ~make~
+
+*** As an Library
+
 1. Clone this repository in quicklisp's local-projects folder.
 
-2. Load this project from your repl
+2. Load this project from your REPL
 
 #+begin_src lisp
   (ql:quickload :cl-site-gen)
