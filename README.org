@@ -1,0 +1,30 @@
+* Cl-Site-Gen 
+This is a simple static site generator for those crazy enough to want
+to write their websites in CL. This project is focused on being simple
+and letting you determin how you want the site to look
+
+** Usage
+
+#+begin_src lisp
+  (cl-site-gen:create-sites #p"path/to/lisp/files"
+                            #p"where/to/output/the/html/files")
+#+end_src
+
+For an examples input directory take a look at [[./example]]
+
+** Installation
+1. Clone this repository in quicklisp's local-projects folder.
+
+2. Load this project from your repl
+
+#+begin_src lisp
+  (ql:quickload :cl-site-gen)
+#+end_src
+
+** Author
+
++ Gavin Jaeger-Freeborn (gavinfreeborn@gmail.com)
+
+** Copyright
+
+Copyright (c) 2022 Gavin Jaeger-Freeborn (gavinfreeborn@gmail.com)
