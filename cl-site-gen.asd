@@ -12,7 +12,11 @@
                 :components
                 ((:file "main"))))
   :description "Create Your Static Websites With Lisp"
-  :in-order-to ((test-op (test-op "cl-site-gen/tests"))))
+  :in-order-to ((test-op (test-op "cl-site-gen/tests")))
+  ;; Build a binary
+  :build-operation "program-op"
+  :build-pathname "csg"
+  :entry-point "csg::main")
 
 (defsystem "cl-site-gen/tests"
   :author "Gavin Jaeger-Freeborn"

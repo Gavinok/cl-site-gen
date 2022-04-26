@@ -16,7 +16,6 @@
            #:ref))
 (in-package :cl-site-gen)
 
-
 (defun ref (path &key (new-extension ".html"))
   "A simple way to convert file paths from .lisp extensions to .html.
 For use in users code.
@@ -36,8 +35,8 @@ NEW-EXTENSION."
 (defun recursively-find-files (path &key (file-extension ".lisp"))
   "Recursively find all files ending with the given FILE-EXTENSION and
 return it as an fset:seq."
-  (if (and (pathnamep path) (uiop:directory-exists-p path))
-      (->> (concatenate 'string (uiop:native-namestring path)
+  (if (uiop:directory-exists-p path)
+      (->> (concatenate 'string (uiop:native-namestring (pathname path))
                         "/**/*"
                         file-extension)
            directory
@@ -62,9 +61,8 @@ to the end."
 
         (concatenate 'string
                      opath
-                     (replace-extension
-                      p :start (length ipath)
-                        :new-extension file-extension))))))
+                     (replace-extension p :start (length ipath)
+                                          :new-extension file-extension))))))
 
 (defun eval-file (file)
   "Evaluate a FILE and return the final evaluated flute output into a
@@ -80,25 +78,46 @@ string."
                         (:content (eval-file path))))
     (seq (image #'eval-path path))))
 
+(defun write-html-to-file (content file-path &key (if-exits :error) (if-does-not-exist :create))
+  (let ((file (ensure-directories-exist file-path)))
+    (write-string-into-file content file
+                            :if-exists if-exits
+                            :if-does-not-exist if-does-not-exist)))
+
 (defun create-sites
-    (input-path output-path &key (if-exits :error) (write-to-string-function #'flute:elem-str))
+    (input-path output-path &key (if-exits :error) (if-does-not-exist :create) (to-string-function #'flute:elem-str))
   "Evaluate all of the lisp files under the INPUT-PATH directory and
 generate a directory OUTPUT-PATH containing the resulting strings with
-the file extension changed to .html"
-  (let ((output-contents (-> input-path
-                             recursively-find-files
-                             eval-path))
+the file extension changed to `.html'.
+
+The way that a file is converted from the input path to the output
+path is determined by the TO-STRING-FUNCTION.
+"
+  (let ((output-contents (-> input-path recursively-find-files))
         (path-conv       (input-to-output-path input-path output-path)))
 
     (loop :with iter = (fset:iterator output-contents)
-          :for i = (funcall iter :get)
+          :for i = (eval-path (funcall iter :get))
           :until (funcall iter :done?)
-          :do (write-string-into-file (funcall write-to-string-function (fset:@ i :content))
-                                      (ensure-directories-exist
-                                       (funcall path-conv (fset:@ i :path)))
-                                      :if-exists if-exits))))
+          :do (write-html-to-file (funcall to-string-function (fset:@ i :content))
+                                  (funcall path-conv (fset:@ i :path))
+                                  :if-exits if-exits
+                                  :if-does-not-exist if-does-not-exist))))
+
+(defun main ()
+  (let ((help (or (member "-h" uiop:*command-line-arguments* :test #'equal)
+                  (member "--help" uiop:*command-line-arguments* :test #'equal)
+                  (< 2 (length uiop:*command-line-arguments*))))
+        (input-directory  (first uiop:*command-line-arguments*))
+        (output-directory (second uiop:*command-line-arguments*)))
+    (when help
+      (format t "csg input-directory output-directory	Generate static site in output-directory.~% csg")
+      (uiop:quit))
+    (create-sites input-directory output-directory)
+    (princ "Yay it worked")))
 
 (defun demo ()
   (create-sites
    #p"example"
-   #p"example-res"))
+   #p"example-res"
+   :if-exits :overwrite))
