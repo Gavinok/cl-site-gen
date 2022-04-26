@@ -1,6 +1,6 @@
-(progn (defun testing ()
-         (flute:p "hello world"))
+(defun testing ()
+  (flute:p "hello world"))
 
-       (flute:h
-         (html (h1 "again")
-               (testing))))
+(flute:h
+  (html (h1 "again")
+        (testing)))

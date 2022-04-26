@@ -68,8 +68,10 @@ to the end."
   "Evaluate a FILE and return the final evaluated flute output into a
 string."
   (with-open-file (in file)
-    (when-let ((expr (read in nil)))
-      (eval expr))))
+    (loop :for expr = (read in nil :eof)
+          :when (eq expr :eof)
+            :return (car (last xs))
+          :collect (eval expr) :into xs)))
 
 (defun eval-path (path)
   "Recusively evaluate files into html strings."
@@ -99,10 +101,12 @@ path is determined by the TO-STRING-FUNCTION.
     (loop :with iter = (fset:iterator output-contents)
           :for i = (eval-path (funcall iter :get))
           :until (funcall iter :done?)
-          :do (write-html-to-file (funcall to-string-function (fset:@ i :content))
-                                  (funcall path-conv (fset:@ i :path))
-                                  :if-exits if-exits
-                                  :if-does-not-exist if-does-not-exist))))
+          :do (when-let ((content (fset:@ i :content))
+                         (path (fset:@ i :path)))
+                (write-html-to-file (funcall to-string-function content)
+                                    (funcall path-conv path)
+                                    :if-exits if-exits
+                                    :if-does-not-exist if-does-not-exist)))))
 
 (defun main ()
   (let ((help (or (member "-h" uiop:*command-line-arguments* :test #'equal)
