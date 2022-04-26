@@ -1,7 +1,7 @@
 * CL-SITE-GEN
 This is a simple static site generator for those crazy enough to want
 to write their websites in CL. This project is focused on being simple
-and letting you determin how you want the site to look
+and letting you determine how you want the site to look.
 
 ** Usage
 
