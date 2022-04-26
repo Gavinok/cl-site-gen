@@ -121,6 +121,12 @@ path is determined by the TO-STRING-FUNCTION.
     (princ "Yay it worked")))
 
 (defun demo ()
+  (defmacro -example-template (title &body body)
+    `(flute:h
+       (html
+        (head (title ,title))
+        (body
+         ,@body))))
   (create-sites
    #p"example"
    #p"example-res"
