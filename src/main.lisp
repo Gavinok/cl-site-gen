@@ -25,7 +25,7 @@ e.g.
 
 (defun replace-extension
     (path &key (start 0) (new-extension ".html"))
-  "Change the file extension the in the given PATH to the
+  "Change the file extension in the given PATH to the
 NEW-EXTENSION."
   (let ((p (namestring path)))
     (concatenate 'string
