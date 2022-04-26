@@ -1,5 +1,6 @@
 (uiop:define-package cl-site-gen
   (:use :cl)
+  (:nicknames #:csg)
   (:import-from #:alexandria
                 #:when-let
                 #:write-string-into-file)
@@ -11,7 +12,8 @@
                 #:seq
                 #:with
                 #:@)
-  (:export #:create-sites))
+  (:export #:create-sites
+           #:ref))
 (in-package :cl-site-gen)
 
 
