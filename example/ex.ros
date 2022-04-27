@@ -1,0 +1,57 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '(cl-site-gen) :silent t)
+  )
+
+(defpackage :ros.script.ex.3860024971
+  (:use :cl))
+(in-package :ros.script.ex.3860024971)
+
+(defmacro -example-template (title &body body)
+  "
+Syntax:
+
+-example-template (title &body body) => html-string
+
+Arguments and Values:
+
+title--a string
+body--lists to be used for the contents of the page's body
+
+Description:
+
+Basic template to demo just how easy it is to extend CL-SITE-GEN.
+
+Examples:
+(-example-template
+  \"This is the title to my example webpage\"
+  (h1 \"heading 1\")
+  (p \"content\"))
+"
+  `(flute:h
+     (html
+      (head (title ,title))
+      (body
+       ,@body))))
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+  (csg:create-sites
+   (asdf:system-relative-pathname
+    :cl-site-gen #p"example/site")
+   (asdf:system-relative-pathname
+    :cl-site-gen #p"example-res")
+   :if-exits :overwrite
+   ;; Convert the read contents to a string if needed Really this just
+   ;; allows us to generate the resulting html as a string from the
+   ;; lisp file or just return the html and evaluate it later
+   :to-string-function (lambda (x)
+                         (if (or (stringp x) (null x))
+                             x
+                             (flute:elem-str x)))))
+;;; vim: set ft=lisp lisp:

@@ -81,13 +81,14 @@ string."
     (seq (image #'eval-path path))))
 
 (defun write-html-to-file (content file-path &key (if-exits :error) (if-does-not-exist :create))
+  "Writes the string CONTENT into the file at FILE-PATH"
   (let ((file (ensure-directories-exist file-path)))
     (write-string-into-file content file
                             :if-exists if-exits
                             :if-does-not-exist if-does-not-exist)))
 
 (defun create-sites
-    (input-path output-path &key (if-exits :error) (if-does-not-exist :create) (to-string-function #'flute:elem-str))
+    (input-path output-path &key (if-exits :error) (if-does-not-exist :create) to-string-function)
   "Evaluate all of the lisp files under the INPUT-PATH directory and
 generate a directory OUTPUT-PATH containing the resulting strings with
 the file extension changed to `.html'.
@@ -100,13 +101,15 @@ path is determined by the TO-STRING-FUNCTION.
 
     (loop :with iter = (fset:iterator output-contents)
           :for i = (eval-path (funcall iter :get))
-          :until (funcall iter :done?)
-          :do (when-let ((content (fset:@ i :content))
-                         (path (fset:@ i :path)))
-                (write-html-to-file (funcall to-string-function content)
-                                    (funcall path-conv path)
-                                    :if-exits if-exits
-                                    :if-does-not-exist if-does-not-exist)))))
+          :while (funcall iter :more?)
+          :collect (when-let ((content (if to-string-function
+                                           (funcall to-string-function (fset:@ i :content))
+                                           (fset:@ i :content)))
+                              (path (fset:@ i :path)))
+                     (write-html-to-file (the string content)
+                                         (funcall path-conv path)
+                                         :if-exits if-exits
+                                         :if-does-not-exist if-does-not-exist)))))
 
 (defun main ()
   (let ((help (or (member "-h" uiop:*command-line-arguments* :test #'equal)
@@ -119,15 +122,3 @@ path is determined by the TO-STRING-FUNCTION.
       (uiop:quit))
     (create-sites input-directory output-directory)
     (princ "Yay it worked")))
-
-(defun demo ()
-  (defmacro -example-template (title &body body)
-    `(flute:h
-       (html
-        (head (title ,title))
-        (body
-         ,@body))))
-  (create-sites
-   #p"example"
-   #p"example-res"
-   :if-exits :overwrite))

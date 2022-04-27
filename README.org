@@ -8,7 +8,7 @@ configured by the user.
 
 ** Usage
 
-*** As an Executable
+*** As an Executable (experimental)
 
 #+begin_src bash
   csg "path/to/lisp/files" "where/to/output/the/html/files"
