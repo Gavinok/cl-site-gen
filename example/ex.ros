@@ -12,6 +12,13 @@ exec ros -Q -- $0 "$@"
   (:use :cl))
 (in-package :ros.script.ex.3860024971)
 
+#|
+While this example uses roswell I would consider this a incomplete
+solution since the project expects the user to have access to the
+debugger which will prompt the user on common errors such as
+overwriting files if not explicitly told to.
+|#
+
 (defmacro -example-template (title &body body)
   "
 Syntax:
@@ -42,10 +49,8 @@ Examples:
 (defun main (&rest argv)
   (declare (ignorable argv))
   (csg:create-sites
-   (asdf:system-relative-pathname
-    :cl-site-gen #p"example/site")
-   (asdf:system-relative-pathname
-    :cl-site-gen #p"example-res")
+   (asdf:system-relative-pathname :cl-site-gen #p"example/site")
+   (asdf:system-relative-pathname :cl-site-gen #p"example-res")
    :if-exits :overwrite
    ;; Convert the read contents to a string if needed Really this just
    ;; allows us to generate the resulting html as a string from the
