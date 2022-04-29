@@ -5,7 +5,7 @@ exec ros -Q -- $0 "$@"
 |#
 (progn ;;init forms
   (ros:ensure-asdf)
-  #+quicklisp(ql:quickload '(cl-site-gen) :silent t)
+  #+quicklisp(ql:quickload '(cl-site-gen flute lass) :silent t)
   )
 
 (defpackage :ros.script.ex.3860024971
@@ -18,6 +18,70 @@ solution since the project expects the user to have access to the
 debugger which will prompt the user on common errors such as
 overwriting files if not explicitly told to.
 |#
+
+(declaim (ftype (function (number number number number) string) css-rgba))
+(defun css-rgba (red blue green alpha)
+  (format nil "rgba(~a, ~a, ~a, ~a)"
+          red blue green alpha))
+
+(flute:define-element href (path text)
+  (flute:a :href (if (pathnamep path)
+                 (csg:ref path)
+                 path)
+     text))
+
+(defmacro s (&body text)
+  (let ((t-as-string (write-to-string text)))
+    (concatenate 'string
+     (subseq t-as-string 1 2)
+     (subseq (string-downcase t-as-string)
+            2 (- (length t-as-string) 1))
+     " ")))
+
+(defmacro code (&body contents)
+  `(pre (write-to-string ',contents)))
+
+(flute:define-element code (content)
+  (flute:pre (write-to-string content)))
+
+(defparameter *css*
+  (let ((fg "#edf0f1")
+        (bg "#24252A")
+        (pre-bg "#14151A")
+        (accent "#0088a9")
+        (po "2rem"))
+    (lass:compile-and-write
+     `(* :font-family "monospace"
+         :box-sizeing "border-box"
+         :margin 0
+         :padding 0
+         :background-color ,bg
+         :color ,fg)
+     `(pre :padding "10px"
+           :background-color ,pre-bg
+           (.none :background-color ,pre-bg))
+     `(h1 :font-size "3rem"
+          :text-transform "uppercase"
+          :text-align "center")
+     `(h2 :font-size "2rem")
+     `(p :font-size "12pt")
+     `((:or h1 h2 pre p) :margin ,po)
+     `((:or li a button) :font-weight 500
+                         :font-size 15px
+                         :color ,fg
+                         :text-decoration "none")
+     `(header
+       :padding "30px")
+     `(.nav__links :list-style "none"
+                   :align-items "center"
+                   :justify-content "center"
+                   :display "flex"
+                   :text-align "center"
+                   (li :flex "100%"
+                    (a :transition "all 0.3s ease 0s")
+                    ((:and a :hover)
+                     :color ,accent))))))
+
 
 (defmacro -example-template (title &body body)
   "
@@ -43,7 +107,14 @@ Examples:
   `(flute:h
      (html
       (head (title ,title))
+      (style ,*css*)
       (body
+       (header ;; <img class=logo src="add your logo here" alt="logo">
+        (nav
+         (ul.nav__links
+          (li (a :href "#" "about"))
+          (li (a :href "#" "motivation"))
+          (li (a :href "#" "example")))))
        ,@body))))
 
 (defun main (&rest argv)
