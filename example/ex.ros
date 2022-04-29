@@ -122,7 +122,7 @@ Examples:
   (csg:create-sites
    (asdf:system-relative-pathname :cl-site-gen #p"example/site")
    (asdf:system-relative-pathname :cl-site-gen #p"example-res")
-   :if-exits :overwrite
+   :if-exits :supersede
    ;; Convert the read contents to a string if needed Really this just
    ;; allows us to generate the resulting html as a string from the
    ;; lisp file or just return the html and evaluate it later

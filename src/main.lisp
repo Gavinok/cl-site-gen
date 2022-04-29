@@ -68,10 +68,11 @@ to the end."
   "Evaluate a FILE and return the final evaluated flute output into a
 string."
   (with-open-file (in file)
-    (loop :for expr = (read in nil :eof)
-          :when (eq expr :eof)
+    (let ((eof (gensym)))
+      (loop :for expr = (read in nil eof)
+            :when (eql expr eof)
             :return (car (last xs))
-          :collect (eval expr) :into xs)))
+          :collect (eval expr) :into xs))))
 
 (defun eval-path (path)
   "Recusively evaluate files into html strings."
@@ -89,7 +90,29 @@ string."
 
 (defun create-sites
     (input-path output-path &key (if-exits :error) (if-does-not-exist :create) to-string-function)
-  "Evaluate all of the lisp files under the INPUT-PATH directory and
+  "Syntax:
+
+`create-sites' input-path output-path &key if-exists if-does-not-exist to-string-function
+
+=> pages
+
+Arguments and Values:
+
+`input-path'---a `pathname' to the directory containing the lisp files used to generate the site
+
+`output-path'---a `pathname' to the directory where the generated HTML files will be stored
+
+`if-exists'---same as in cl:open
+
+`if-does-not-exist'---same as in cl:open
+
+`to-string-function'---a designator for a function that will take the evaluated result of the final s-expression in every lisp file
+
+`pages'--a list of strings containing the resulting html
+
+Description:
+
+Evaluate all of the lisp files under the INPUT-PATH directory and
 generate a directory OUTPUT-PATH containing the resulting strings with
 the file extension changed to `.html'.
 
@@ -112,9 +135,12 @@ path is determined by the TO-STRING-FUNCTION.
                                          :if-does-not-exist if-does-not-exist)))))
 
 (defun main ()
+  "A very very beta version of a commandline interface. Not really ready
+for prime time."
   (let ((help (or (member "-h" uiop:*command-line-arguments* :test #'equal)
                   (member "--help" uiop:*command-line-arguments* :test #'equal)
-                  (< 2 (length uiop:*command-line-arguments*))))
+                  ;; < 2 arguments
+                  (null (second uiop:*command-line-arguments*))))
         (input-directory  (first uiop:*command-line-arguments*))
         (output-directory (second uiop:*command-line-arguments*)))
     (when help
