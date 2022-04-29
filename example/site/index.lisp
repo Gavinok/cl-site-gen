@@ -26,7 +26,7 @@
 (set-macro-character #\@ #'string-reader)
 (-example-template
     "CL-SITE-GEN Home Page"
-  (h1 @(Welcome to the home page 'of CL-SITE-GEN))
+  (h1 @(Welcome to the home page of CL-SITE-GEN))
   (h2 @(What is CL-SITE-GEN?))
   (p  @(CL-SITE-GEN is a static site (generator) that takes valid Common
         Lisp code and uses that to generate html to create a static
