@@ -19,8 +19,7 @@
   (let ((this (let ((*readtable* (copy-readtable)))
                 ;; Use case sensitive symbols
                 (setf (readtable-case *readtable*) :preserve)
-                (read stream t nil t)))
-        (quote (get-macro-character #\')))
+                (read stream t nil t))))
     (my-list-to-string this)))
 
 (set-macro-character #\@ #'string-reader)

@@ -30,20 +30,6 @@ overwriting files if not explicitly told to.
                  path)
      text))
 
-(defmacro s (&body text)
-  (let ((t-as-string (write-to-string text)))
-    (concatenate 'string
-     (subseq t-as-string 1 2)
-     (subseq (string-downcase t-as-string)
-            2 (- (length t-as-string) 1))
-     " ")))
-
-(defmacro code (&body contents)
-  `(pre (write-to-string ',contents)))
-
-(flute:define-element code (content)
-  (flute:pre (write-to-string content)))
-
 (defparameter *css*
   (let ((fg "#edf0f1")
         (bg "#24252A")
